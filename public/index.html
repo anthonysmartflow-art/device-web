@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fa">
+  <meta name="description" content="Preview your website in live iPhone, iPad and MacBook frames, all in one place.">
+  <title>Device Web — your website, every screen</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#url">Skip to website URL</a>
+  <header class="topbar">
+    <a class="wordmark" href="/" aria-label="Device Web home"><img src="/favicon.svg" alt="" width="28" height="28"><span>device<span class="wordmark-light">web</span></span></a>
+    <span class="top-note">One website. Every screen.</span>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <h1 id="page-title">Your website, every screen.</h1>
+      <p>See it on iPhone, iPad and MacBook. Side by side.</p>
+      <form id="url-form" novalidate>
+        <label class="sr-only" for="url">Website URL</label>
+        <div class="url-field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></svg>
+          <input id="url" name="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" autocapitalize="none" placeholder="your-website.vercel.app" aria-describedby="url-error">
+          <button class="submit" type="submit">Preview <span aria-hidden="true">↗</span></button>
+        </div>
+        <p id="url-error" class="error" role="alert"></p>
+      </form>
+      <button id="demo" class="text-button" type="button">Try an example website <span aria-hidden="true">→</span></button>
+    </section>
+    <section class="workspace" aria-label="Website previews">
+      <div class="workspace-tools">
+        <div class="device-switch" role="group" aria-label="Devices to show">
+          <button type="button" data-view="all" aria-pressed="true">All devices</button>
+          <button type="button" data-view="phone" aria-pressed="false">iPhone</button>
+          <button type="button" data-view="tablet" aria-pressed="false">iPad</button>
+          <button type="button" data-view="laptop" aria-pressed="false">MacBook</button>
+        </div>
+        <div class="preview-actions">
+          <button id="reload" class="icon-button" disabled type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M19 12a7 7 0 1 0-2 5M20 12a8 8 0 0 0-2-6"/></svg><span>Reload</span></button>
+          <a id="open-site" class="icon-button" target="_blank" rel="noopener noreferrer" hidden>Open site <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div id="devices" class="devices" data-view="all"></div>
+      <div class="workspace-caption"><p id="preview-status" role="status">Ready when you are.</p><span>Live pages · Scroll each screen</span></div>
+    </section>
+    <footer class="footer">
+      <p>Screen-size previews, using your current browser.</p>
+      <details id="help">
+        <summary>Screen not loading?</summary>
+        <div class="help-content">
+          <p>Open the site in a new tab first to check that it works.</p>
+          <p>A Vercel login screen may mean the deployment is protected. Sign in in a new tab, or use a public deployment URL.</p>
+          <p>If the page refuses to connect, its security settings may block embedding. Allow this viewer’s domain in that website’s settings.</p>
+          <p>Some sign-ins need cookies that browsers block inside embedded pages. This viewer cannot bypass those restrictions.</p>
+        </div>
+      </details>
+    </footer>
+  </main>
+  <noscript><p class="noscript">Enable JavaScript to load your website into the device previews.</p></noscript>
+</body>
+</html>
