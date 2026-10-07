@@ -24,22 +24,19 @@ if (embedded) {
   const sync = new ScrollSync({
     isAllDevices: () => devices.dataset.view === 'all',
     onChange: ({ enabled, total, ready, samePage }) => {
-      syncButton.setAttribute('aria-pressed', String(enabled));
-      syncButton.disabled = !total;
+      syncButton.setAttribute('aria-pressed', String(enabled && ready >= 2));
+      syncButton.disabled = ready < 2;
+      syncButton.title = ready >= 2 ? 'Link scrolling across connected devices' : 'Install the browser helper or connect this site to enable scroll sync';
       syncSetup.hidden = !total || ready === total;
       if (!total) syncStatus.textContent = 'Live pages · Linked scrolling available';
       else if (!enabled) syncStatus.textContent = 'Scroll sync off';
       else if (devices.dataset.view !== 'all') syncStatus.textContent = 'Scroll sync applies in All devices';
       else if (ready === total && samePage) syncStatus.textContent = 'Scroll linked across all devices';
       else if (ready === total) syncStatus.textContent = 'Scroll linked for devices on the same page';
-      else syncStatus.textContent = ready ? `Scroll helper connected: ${ready} of ${total}` : 'Scroll sync needs a site connection';
+      else syncStatus.textContent = ready ? `Scroll helper connected: ${ready} of ${total}` : 'Enable the browser helper to link scrolling';
     },
   });
   syncButton.addEventListener('click', () => sync.toggle());
-  syncSetup.addEventListener('click', () => {
-    document.querySelector('#help').open = true;
-    document.querySelector('#sync-instructions').scrollIntoView({ block: 'nearest' });
-  });
   for (const spec of specs) {
     const figure = document.createElement('figure');
     figure.className = `device device-${spec.id}`;

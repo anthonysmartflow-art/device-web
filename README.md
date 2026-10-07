@@ -4,7 +4,7 @@ A small website previewer: enter a URL and inspect the live page inside iPhone, 
 
 ## Use
 
-Paste an HTTPS website URL and select **Preview**. Scrolling is linked in All devices when the target site has the scroll helper. Links navigate independently. Use the device buttons for a larger single-device view, **Reload** to reset all three screens to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
+Paste an HTTPS website URL and select **Preview**. Scrolling is linked in All devices when the browser extension is installed or the target site has the scroll helper. Links navigate independently. Use the device buttons for a larger single-device view, **Reload** to reset all three screens to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
 
 Desktop starts with all three devices. Narrow screens start with the iPhone; every view is available. The last submitted URL is remembered in this browser, but is never loaded automatically on return.
 
@@ -55,7 +55,10 @@ URLs go directly from your browser to the website. There is no URL-fetching back
 
 **Sync scroll** is on by default and applies in **All devices**. Scrolling any connected device moves the other connected devices on the same page to the same percentage of their scroll range. Different responsive layouts have different heights, so their exact section positions may differ. The control turns syncing off when independent scrolling is useful. Individual device views do not broadcast scrolls.
 
-The example page is already connected. Each website you own needs a one-time helper installation, because browsers do not let one origin read or set another origin's scroll position. This cannot be fixed by a CORS header.
+The example page is already connected. For existing and future websites without changing each codebase, install the **Device Web Scroll Sync** Chrome/Edge extension once. Download and instructions: https://device-web-five.vercel.app/setup.html. Extension source is in `extension/`. It activates only in direct website frames inside the production viewer and shares the existing bridge guard to prevent duplicate handlers.
+
+Browsers do not let an ordinary website read or set another origin's scroll position. This cannot be fixed by a CORS header. In Safari or the Codex in-app browser, use the site helper instead:
+
 
 1. Copy `public/device-web-sync.js` from this repository into the target site's public folder.
 2. Load it on each page with `<script src="/device-web-sync.js" defer></script>`. In Next.js, use `next/script` with `src="/device-web-sync.js"` and `strategy="afterInteractive"` in the root layout.

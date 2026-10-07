@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Device Web Scroll Sync",
+  "version": "1.0.0",
+  "description": "Links scrolling across the device previews in Device Web, without changing each website.",
+  "minimum_chrome_version": "120",
+  "homepage_url": "https://device-web-five.vercel.app",
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["scroll-bridge.js"],
+      "all_frames": true,
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}
