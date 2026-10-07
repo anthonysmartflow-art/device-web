@@ -66,6 +66,7 @@ if (embedded) {
 
   function setView(view) {
     devices.dataset.view = view;
+    if (activeUrl) loadVisibleDevices();
     sync.notify();
     document.querySelectorAll('[data-view]').forEach(button => {
       if (button.tagName === 'BUTTON') button.setAttribute('aria-pressed', String(button.dataset.view === view));
@@ -85,21 +86,32 @@ if (embedded) {
     openSite.href = url;
     openSite.hidden = false;
     status.textContent = example ? 'Example website' : `Previewing ${new URL(url).hostname}`;
+    // Discard the previous URL in every device, including hidden devices.
+    for (const screen of devices.querySelectorAll('.screen')) screen.replaceChildren();
+    loadVisibleDevices();
+    sync.notify();
+    // Remember only a convenience value. Reloading the app never opens a saved site automatically.
+    try { if (!example) localStorage.setItem('device-web:last-url', url); } catch { /* Storage is optional. */ }
+  }
+
+  function loadVisibleDevices() {
+    const view = devices.dataset.view;
     for (const spec of specs) {
+      if (view !== 'all' && view !== spec.id) continue;
       const screen = devices.querySelector(`[data-device="${spec.id}"] .screen`);
+      // Switching views reuses pages already loaded, including their position.
+      if (screen.querySelector('iframe')) continue;
       const frame = document.createElement('iframe');
       frame.title = `${spec.name} website preview — ${spec.width} by ${spec.height}`;
       frame.width = spec.width;
       frame.height = spec.height;
       frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals');
       frame.referrerPolicy = 'no-referrer';
-      sync.add(frame, url);
-      frame.src = url;
+      frame.loading = 'eager';
+      sync.add(frame, activeUrl);
+      frame.src = activeUrl;
       screen.replaceChildren(frame);
     }
-    sync.notify();
-    // Remember only a convenience value. Reloading the app never opens a saved site automatically.
-    try { if (!example) localStorage.setItem('device-web:last-url', url); } catch { /* Storage is optional. */ }
   }
 
   document.querySelector('#url-form').addEventListener('submit', event => {

@@ -4,7 +4,9 @@ A small website previewer: enter a URL and inspect the live page inside iPhone, 
 
 ## Use
 
-Paste an HTTPS website URL and select **Preview**. Scrolling is linked in All devices when the browser extension is installed or the target site has the scroll helper. Links navigate independently. Use the device buttons for a larger single-device view, **Reload** to reset all three screens to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
+Paste an HTTPS website URL and select **Preview**. Scrolling is linked in All devices when the browser extension is installed or the target site has the scroll helper. Links navigate independently. Use the device buttons for a larger single-device view, **Reload** to reset previews to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
+
+All devices loads its three pages concurrently. Starting in a single-device view loads only that device; other pages load when selected. Switching views reuses already loaded pages. Reload or a new URL clears every old page, including hidden ones. Scroll sync can connect before slow images finish loading and works with the existing v1 extension/helper. See [performance notes](PERFORMANCE.md) for measurements and limits.
 
 Desktop starts with all three devices. Narrow screens start with the iPhone; every view is available. The last submitted URL is remembered in this browser, but is never loaded automatically on return.
 
