@@ -103,3 +103,16 @@ test('extension and existing website helper never attach duplicate listeners in 
     assert.equal(f.posts.length, 1);
   }
 });
+
+test('site helper and extension share exactly the same interaction and scroll runtime', () => {
+  const runtime = source => source.slice(source.indexOf("  const CHANNEL ="));
+  assert.equal(runtime(script), runtime(helper));
+});
+
+test('advertises interaction capability and does not capture clicks until configured', () => {
+  const f = frame();
+  f.run(script); f.message({ type: 'connect' });
+  assert.equal(f.posts[0].message.capabilities[0], 'interactions-v1');
+  f.emit('click', { isTrusted: true, button: 0 });
+  assert.equal(f.posts.length, 1);
+});

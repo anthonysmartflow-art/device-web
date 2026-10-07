@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Set up scroll sync — Device Web</title>
+  <title>Set up device sync — Device Web</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css">
   <style>
     .setup{max-width:740px;margin:32px auto 70px;padding:0 28px}.setup h1{font-size:36px;letter-spacing:-1px;line-height:1.2}.setup p,.setup li{font-size:15px;line-height:1.7;color:#536174}.setup .lead{font-size:18px;margin:18px 0 28px}.download{display:inline-flex;text-decoration:none;margin:4px 0 20px}.setup ol{padding-left:24px;margin:12px 0 30px}.setup li{padding:8px 0 14px 8px}.setup li strong{display:block;color:var(--ink);font-weight:600}.setup code{font-size:13px;color:var(--ink);background:#e7ecf0;padding:3px 6px;border-radius:4px;overflow-wrap:anywhere}.setup aside{padding:18px 22px;background:white;border:1px solid var(--edge);border-radius:10px}.setup aside p{font-size:13px;margin:8px 0}.setup h2{font-size:17px;margin:0 0 12px}.setup .back{display:inline-block;margin-top:26px;font-size:14px}.setup a:focus-visible{outline:3px solid #3b7dab;outline-offset:4px}
@@ -12,19 +12,21 @@
   <header class="topbar"><a class="wordmark" href="/"><img src="/favicon.svg" alt="" width="28" height="28"><span>device<span class="wordmark-light">web</span></span></a></header>
   <main class="setup">
     <h1>One setup. All your websites.</h1>
-    <p class="lead">Connect scrolling across your previews with the Device Web browser helper. Install it once in Chrome or Edge, then use your existing and future Vercel sites.</p>
+    <p class="lead">Connect scrolling, page links, menus and tabs across your previews with browser helper version 1.1. Install it once in Chrome or Edge, then use your existing and future Vercel sites.</p>
     <a class="submit download" href="/device-web-scroll-helper.zip" download>Download browser helper <span aria-hidden="true">↓</span></a>
     <ol>
       <li><strong>Download and unzip the helper.</strong>Keep the unzipped folder somewhere permanent on your computer.</li>
       <li><strong>Open your browser’s extensions page.</strong>In Chrome, enter <code>chrome://extensions</code> in the address bar. In Edge, enter <code>edge://extensions</code>. Turn on <b>Developer mode</b>.</li>
       <li><strong>Choose “Load unpacked” and select the helper folder.</strong>Select the folder containing <code>manifest.json</code>. Reopen Device Web in that browser, load your website, and keep <b>All devices</b> selected.</li>
     </ol>
+    <h2>Already installed? Update your helper</h2>
+    <p>Download and unzip the new helper. Copy its files into your existing helper folder, replacing the old files. In <code>chrome://extensions</code>, click the reload icon on <b>Device Web Scroll Sync</b>. Check that its version is <b>1.1.0</b>, then refresh Device Web.</p>
     <aside>
       <h2>What to expect</h2>
-      <p>The caption says <b>Scroll linked across all devices</b> when the connection is ready. Scrolling any device moves the others to the same percentage down the page.</p>
-      <p>The extension requests access to HTTPS pages so it works with new project URLs. It activates only in website frames directly inside Device Web. It sends no data to a server and does not change your website’s code.</p>
+      <p>Keep <b>Sync scroll</b> and <b>Sync clicks</b> on in All devices. Page links open the same destination in all screens. Matching menus, tabs and accordions follow each other; desktop and mobile layouts can still look different.</p>
+      <p>The extension requests access to HTTPS pages so it works with new project URLs. It activates only in website frames directly inside Device Web. It sends scroll positions, page destinations and control identifiers between the previews and this viewer. It sends no data to a server and does not change your website’s code.</p>
       <p>Use Chrome or Edge on a computer. Installing it in Chrome does not add it to Safari or the Codex in-app browser. Sites with the built-in helper work without the extension.</p>
-      <p>Websites must still allow embedding. The helper cannot bypass sign-in or security restrictions. It links the main page’s scrolling; independently scrolling menus and panels are excluded.</p>
+      <p>Websites must still allow embedding. The helper cannot bypass sign-in or security restrictions. Form fields, submit buttons, ordinary action buttons, external links and downloads marked by the site stay independent. Custom controls without matching identifiers or accessibility attributes may not sync. Independently scrolling menus and panels are excluded.</p>
     </aside>
     <a class="back" href="/">← Back to Device Web</a>
   </main>

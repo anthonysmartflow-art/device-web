@@ -4,7 +4,7 @@ A small website previewer: enter a URL and inspect the live page inside iPhone, 
 
 ## Use
 
-Paste an HTTPS website URL and select **Preview**. Scrolling is linked in All devices when the browser extension is installed or the target site has the scroll helper. Links navigate independently. Use the device buttons for a larger single-device view, **Reload** to reset previews to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
+Paste an HTTPS website URL and select **Preview**. Scrolling is linked in All devices when the browser extension is installed or the target site has the scroll helper. With browser helper 1.1, page links and matching menus, tabs and accordions also sync when **Sync clicks** is on. Use the device buttons for a larger single-device view, **Reload** to reset previews to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
 
 All devices loads its three pages concurrently. Starting in a single-device view loads only that device; other pages load when selected. Switching views reuses already loaded pages. Reload or a new URL clears every old page, including hidden ones. Scroll sync can connect before slow images finish loading and works with the existing v1 extension/helper. See [performance notes](PERFORMANCE.md) for measurements and limits.
 
@@ -42,7 +42,7 @@ Embedding must be permitted by the **website being previewed**. Vercel hosting a
 - HTTPS viewers cannot embed HTTP websites. Use the target's HTTPS address.
 - Some websites intentionally navigate outside frames or depend on device/browser detection rather than responsive CSS. This basic viewer is a layout check, not full device emulation.
 
-Browsers deliberately hide cross-origin iframe errors. A frame load event cannot prove content rendered, so the app does not display a misleading "loaded successfully" badge. Use **Preview help** for troubleshooting. Navigation remains independent. Scroll sync requires the opt-in helper described below.
+Browsers deliberately hide cross-origin iframe errors. A frame load event cannot prove content rendered, so the app does not display a misleading "loaded successfully" badge. Use **Preview help** for troubleshooting. The **Sync clicks** control requires browser helper 1.1 (or the updated site helper). Scroll sync requires the opt-in helper described below.
 
 URLs go directly from your browser to the website. There is no URL-fetching backend, analytics, screenshot service or server-side URL storage. The app saves the last URL in localStorage on your device; avoid including secrets in URLs. Iframes allow scripts, forms and user-opened tabs while preventing top-level navigation of the viewer.
 
@@ -66,6 +66,21 @@ Browsers do not let an ordinary website read or set another origin's scroll posi
 2. Load it on each page with `<script src="/device-web-sync.js" defer></script>`. In Next.js, use `next/script` with `src="/device-web-sync.js"` and `strategy="afterInteractive"` in the root layout.
 3. Publish that site, then reload its previews in Device Web. The caption will say **Scroll linked across all devices** only after all three helpers connect.
 
-The helper exits immediately outside an iframe. Inside an iframe, it accepts commands only from the parent window at `https://device-web-five.vercel.app` or its own origin. Messages validate origin, source, handshake token, path and finite scroll range. The helper sends page path and scroll fraction only; it sends no page text, cookies or form values and makes no network requests. The helper handles document scrolling, not separately scrolling menus or nested panels. Devices navigated to different pages do not drive each other.
+The helper exits immediately outside an iframe. Inside an iframe, it accepts commands only from the parent window at `https://device-web-five.vercel.app` or its own origin. Messages validate origin, source, handshake token, path and finite scroll range. The helper sends page path and scroll fraction only; it sends no page text, cookies or form values and makes no network requests. The helper handles document scrolling, not separately scrolling menus or nested panels. Scrolling only links devices on the same page. A synced same-origin page link can bring devices back to the same destination.
 
 If you change the viewer's domain, update the helper's allowed origin or explicitly set `data-viewer-origin="https://your-viewer.example"` on its script tag. Never use a wildcard origin. Redirects to a different origin require entering the final website URL in the viewer.
+
+
+## Linked navigation and controls (helper 1.1)
+
+In **All devices**, **Sync clicks** links normal same-origin page links, ARIA tabs, disclosure buttons (menus/accordions with `aria-expanded`), and native `details` controls. Escape-closing a disclosure and keyboard selection in an ARIA tablist are supported. Targets match by `data-device-web-id`, `id`, `aria-controls`, or a unique accessible label. Hidden or ambiguous matches are skipped; mobile menus do not get forced into the desktop layout. For a custom control, expose its correct role/state and an identical `data-device-web-id` in each responsive version. Use `data-device-web-sync="off"` on an element or ancestor to exclude it.
+
+This is intentionally not a replay of every click. Form elements/controls, editable fields, ordinary action buttons, modified clicks, new-window links, cross-origin links and links marked for download are excluded. Recognizable sign-out/payment/delete URLs are excluded too; this heuristic cannot infer every custom application's side effects. Generic JavaScript actions, hover state, canvas/shadow-root widgets and browser Back/Forward are not mirrored. Use public test pages when evaluating unfamiliar controls.
+
+Only genuine user clicks initiate a relay. Replicated clicks cannot echo; controls are synchronized to the resulting state, so an already-open menu is not accidentally closed. Messages remain bound to the exact frame, origin, current page and rotating connection token. Control identifiers/short labels and link URLs are additional message data; no form values are collected. There are no new extension permissions, server requests or remote scripts.
+
+**Update an existing extension:** download the ZIP from `/setup.html`, replace the files inside the existing unpacked folder, click Reload on its card in `chrome://extensions`, verify version **1.1.0**, then refresh Device Web. Old extensions continue to provide scrolling, with an honest upgrade prompt for interaction sync.
+
+Validation: `npm test`, `npm run build`, then `PLAYWRIGHT_PATH=/path/to/playwright/index.mjs CHROMIUM_PATH=/path/to/Chromium node tests/browser-interactions.mjs`. The browser test uses a temporary profile and controlled fixture, then verifies the public FVF site's actual Next.js menus/navigation. `TEST_LIVE=1` checks the deployed files and repeats the same user flows.
+
+References: [Polypane synchronized interactions](https://polypane.app/docs/synced-interactions/), [trusted and synthetic events](https://developer.mozilla.org/en-US/docs/Web/API/Event/isTrusted), [navigation change events](https://developer.mozilla.org/en-US/docs/Web/API/Navigation/currententrychange_event).

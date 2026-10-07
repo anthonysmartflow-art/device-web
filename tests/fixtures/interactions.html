@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font:16px system-ui;margin:20px}button,a,summary{padding:10px;cursor:pointer}button{margin:4px}nav{padding:15px;background:#eee}[hidden]{display:none!important}.desktop{display:none}@media(min-width:1000px){.desktop{display:block}#menu-toggle,#mobile-menu{display:none}}section{margin:25px 0}#bottom{margin-top:2200px}</style></head><body>
+<button id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+<nav id="mobile-menu" hidden><a href="/second">Second page</a> <a href="/spa" class="spa">SPA page</a></nav>
+<nav class="desktop"><a href="/second">Second page</a> <a href="/spa" class="spa">SPA page</a></nav>
+<h1>Interaction fixture</h1>
+<div role="tablist" aria-label="Product details"><button type="button" role="tab" id="overview" aria-selected="true">Overview</button><button type="button" role="tab" id="specs" aria-selected="false">Specifications</button></div>
+<p id="panel">Overview content</p>
+<details id="faq"><summary>Shipping information</summary><p>Accordion content.</p></details>
+<section><button type="button" aria-expanded="false" class="ambiguous">Duplicate control</button><button type="button" aria-expanded="false" class="ambiguous">Duplicate control</button></section>
+<form><label>Name <input name="name"></label><button id="form-toggle" type="button" aria-expanded="false">Form control</button><button id="submit" type="submit">Send</button></form>
+<button type="button" id="purchase">Purchase</button>
+<a href="#bottom">Bottom section</a>
+<div id="bottom">Bottom section</div>
+<script>
+const menu=document.querySelector('#menu-toggle');
+const setMenu=open=>{menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Close menu':'Open menu');document.querySelector('#mobile-menu').hidden=!open};
+menu.onclick=()=>setMenu(menu.getAttribute('aria-expanded')!=='true');
+addEventListener('keydown',e=>{if(e.key==='Escape')setMenu(false)});
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function selectTab(tab){tabs.forEach(t=>t.setAttribute('aria-selected',String(t===tab)));document.querySelector('#panel').textContent=tab.textContent+' content'}
+tabs.forEach((tab,i)=>{tab.onclick=()=>selectTab(tab);tab.onkeydown=e=>{if(e.key==='ArrowRight'){const next=tabs[(i+1)%tabs.length];selectTab(next);next.focus()}}});
+document.querySelectorAll('.ambiguous,#form-toggle').forEach(b=>b.onclick=()=>b.setAttribute('aria-expanded',String(b.getAttribute('aria-expanded')!=='true')));
+document.querySelector('form').onsubmit=e=>{e.preventDefault();document.body.dataset.submits=String(+(document.body.dataset.submits||0)+1)};
+document.querySelector('#purchase').onclick=()=>document.body.dataset.purchases=String(+(document.body.dataset.purchases||0)+1);
+document.querySelectorAll('.spa').forEach(a=>a.onclick=e=>{e.preventDefault();history.pushState({},'',a.href);setMenu(false);document.querySelector('h1').textContent='SPA destination'});
+</script></body></html>

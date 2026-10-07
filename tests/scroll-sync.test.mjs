@@ -99,3 +99,76 @@ test('missing helpers have bounded retries; removed frames cannot restart them',
   assert.equal(f.posts.length, 36);
   assert.equal(f.listeners.size, 0);
 });
+
+const control = { type: 'control', state: true, target: { kind: 'disclosure', key: '', id: '', controls: 'menu', label: 'Open menu', group: '' } };
+const capable = { type: 'ready', capabilities: ['interactions-v1'] };
+const applied = f => f.posts.filter(p => p.data.type === 'apply-interaction');
+
+test('syncs matching controls only on the same page and rejects repeated interactions', t => {
+  const { frame } = setup(t);
+  const a = frame(), b = frame(), c = frame();
+  a.send(capable); b.send(capable); c.send({ ...capable, path: '/other' });
+  a.send({ type: 'interaction', id: 1, action: control });
+  assert.equal(applied(b).length, 1);
+  assert.equal(applied(c).length, 0);
+  a.send({ type: 'interaction', id: 1, action: control });
+  assert.equal(applied(b).length, 1);
+  assert.equal(applied(b)[0].data.token, b.posts[0].data.token);
+});
+
+test('same-origin navigation reunites different pages and waits for a loading peer', t => {
+  const { frame } = setup(t);
+  const a = frame(), b = frame(), c = frame();
+  a.send(capable); b.send({ ...capable, path: '/other' });
+  const action = { type: 'navigate', url: 'https://preview.test/about#team' };
+  a.send({ type: 'interaction', id: 1, action });
+  assert.equal(applied(b)[0].data.path, '/other');
+  assert.equal(applied(b)[0].data.action.url, action.url);
+  assert.equal(applied(c).length, 0);
+  c.send(capable);
+  assert.equal(applied(c).length, 1);
+});
+
+test('old helpers keep scroll sync but cannot send or receive interactions', t => {
+  const { frame, changes } = setup(t);
+  const a = frame(), b = frame();
+  a.send(capable); b.send({ type: 'ready' });
+  a.send({ type: 'interaction', id: 1, action: control });
+  b.send({ type: 'interaction', id: 1, action: control });
+  assert.equal(applied(a).length + applied(b).length, 0);
+  assert.equal(changes.at(-1).interactionReady, 1);
+  a.send({ type: 'scroll', progress: .5 });
+  assert.equal(b.posts.at(-1).data.type, 'scroll-to');
+});
+
+test('click toggle and focused views disable interaction recording and relaying', t => {
+  const { frame, sync, setAll } = setup(t);
+  const a = frame(), b = frame(); a.send(capable); b.send(capable);
+  sync.toggleInteractions();
+  assert.equal(a.posts.at(-1).data.enabled, false);
+  a.send({ type: 'interaction', id: 1, action: control });
+  sync.toggleInteractions(); setAll(false);
+  assert.equal(b.posts.at(-1).data.enabled, false);
+  a.send({ type: 'interaction', id: 2, action: control });
+  assert.equal(applied(b).length, 0);
+  setAll(true);
+  a.send({ type: 'interaction', id: 3, action: control });
+  assert.equal(applied(b).length, 1);
+});
+
+test('rejects forged, cross-origin, credential-bearing and unsupported interaction commands', t => {
+  const { frame } = setup(t);
+  const a = frame(), b = frame(); a.send(capable); b.send(capable);
+  a.send({ type: 'interaction', id: 1, action: control }, { origin: 'https://other.test' });
+  a.send({ type: 'interaction', id: 1, action: control, token: 'old-token' });
+  a.send({ type: 'interaction', id: 1, action: control, path: '/wrong-page' });
+  for (const [i, action] of [
+    { type: 'navigate', url: 'https://other.test/' },
+    { type: 'navigate', url: 'https://name:secret@preview.test/' },
+    { type: 'navigate', url: 'javascript:alert(1)' },
+    { type: 'click', selector: 'button' },
+    { type: 'control', state: true, target: { ...control.target, kind: 'submit' } },
+    { type: 'control', state: true, target: { ...control.target, label: 'x'.repeat(200) } },
+  ].entries()) a.send({ type: 'interaction', id: i + 1, action });
+  assert.equal(applied(b).length, 0);
+});

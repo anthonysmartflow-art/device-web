@@ -19,24 +19,30 @@ if (embedded) {
   document.querySelector('main').innerHTML = '<p class="recursive-message">Open Device Web in its own tab to preview a website.</p>';
 } else {
   const syncButton = document.querySelector('#sync-scroll');
+  const interactionsButton = document.querySelector('#sync-interactions');
   const syncStatus = document.querySelector('#sync-status');
   const syncSetup = document.querySelector('#sync-setup');
   const sync = new ScrollSync({
     isAllDevices: () => devices.dataset.view === 'all',
-    onChange: ({ enabled, total, ready, samePage }) => {
+    onChange: ({ enabled, interactionsEnabled, interactionReady, total, ready, samePage }) => {
       syncButton.setAttribute('aria-pressed', String(enabled && ready >= 2));
       syncButton.disabled = ready < 2;
       syncButton.title = ready >= 2 ? 'Link scrolling across connected devices' : 'Install the browser helper or connect this site to enable scroll sync';
-      syncSetup.hidden = !total || ready === total;
+      interactionsButton.disabled = interactionReady < 2;
+      interactionsButton.setAttribute('aria-pressed', String(interactionsEnabled && interactionReady >= 2));
+      interactionsButton.title = interactionReady >= 2 ? 'Link page links, tabs and menus in All devices' : 'Update the browser helper to version 1.1 for synced links, tabs and menus';
+      syncSetup.hidden = !total || interactionReady === total;
+      syncSetup.textContent = ready === total ? 'Update browser helper ↗' : 'Enable device sync ↗';
       if (!total) syncStatus.textContent = 'Live pages · Linked scrolling available';
-      else if (!enabled) syncStatus.textContent = 'Scroll sync off';
+      else if (!enabled) syncStatus.textContent = interactionsEnabled && interactionReady >= 2 && devices.dataset.view === 'all' ? 'Links and controls linked · Scroll sync off' : 'Device sync off';
       else if (devices.dataset.view !== 'all') syncStatus.textContent = 'Scroll sync applies in All devices';
-      else if (ready === total && samePage) syncStatus.textContent = 'Scroll linked across all devices';
+      else if (ready === total && samePage) syncStatus.textContent = interactionReady === total && interactionsEnabled ? 'Scrolling, links and controls linked across all devices' : 'Scroll linked across all devices';
       else if (ready === total) syncStatus.textContent = 'Scroll linked for devices on the same page';
       else syncStatus.textContent = ready ? `Scroll helper connected: ${ready} of ${total}` : 'Enable the browser helper to link scrolling';
     },
   });
   syncButton.addEventListener('click', () => sync.toggle());
+  interactionsButton.addEventListener('click', () => sync.toggleInteractions());
   for (const spec of specs) {
     const figure = document.createElement('figure');
     figure.className = `device device-${spec.id}`;

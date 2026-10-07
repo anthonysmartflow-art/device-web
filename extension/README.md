@@ -1,37 +1,40 @@
-# Device Web Scroll Sync
+# Device Web Scroll Sync — version 1.1.0
 
-Install this once in Chrome or Edge. Then websites previewed in [Device Web](https://device-web-five.vercel.app) can scroll together without installing a helper on every website.
+Links scrolling, same-site page links, matching menus, tabs and accordions in [Device Web](https://device-web-five.vercel.app).
 
-## Install
+## Install or update
 
-1. Download and unzip the extension. Keep its folder somewhere permanent.
-2. Open `chrome://extensions` in Chrome, or `edge://extensions` in Edge.
-3. Turn on **Developer mode**, select **Load unpacked**, and choose the folder containing `manifest.json`.
-4. Open or refresh Device Web **in that same browser**, paste your website URL, and select **Preview**. Leave **Sync scroll** on and use **All devices**.
+1. Download and unzip the helper. Keep the folder somewhere permanent on your computer.
+2. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge. Turn on **Developer mode**.
+3. For a first install, choose **Load unpacked** and select the folder containing `manifest.json`.
+4. For an update, replace the files inside your existing helper folder, then click **Reload** on its extension card. Verify version **1.1.0**.
+5. Refresh Device Web in the same browser/profile. Select **All devices**, and leave **Sync scroll** and **Sync clicks** on.
 
-The caption will say **Scroll linked across all devices** after all three screens connect. Scrolling any device then moves the others to the same percentage down their pages. Responsive pages have different heights, so section positions can differ.
+Chrome loads this unpacked extension from that folder. Moving or deleting it breaks the installation. This is not a Chrome Web Store listing.
 
-This is a local unpacked extension, not a Chrome Web Store listing. If you move its folder, load it again. After replacing extension files, click **Reload** on its card in the extensions page, then refresh Device Web.
+## What syncs
+
+- Document scroll position, as a percentage of each page's scroll range.
+- Normal same-origin page links, including page sections and client-side routes.
+- Matching menus/disclosures with `aria-expanded`, ARIA tabs and native `details` accordions.
+- Escape-closing disclosures and keyboard selection in ARIA tablists.
+
+A mobile menu stays a mobile menu; a hidden control on desktop is skipped. Controls match by stable IDs, `aria-controls`, an optional `data-device-web-id`, or a unique accessible label. Ambiguous matches are skipped. Custom controls without these semantics may need site changes. Add `data-device-web-sync="off"` to an element/ancestor to exclude it.
+
+Form fields, submissions, ordinary action buttons, external/new-tab links and marked downloads do not sync. Common sign-out/payment/delete URLs are also excluded, but the helper cannot infer all custom application side effects. Browser Back/Forward, hover, nested scrolling panels, canvas and shadow-root widgets are not mirrored.
 
 ## Permissions and privacy
 
-The browser requests access to HTTPS websites because your Vercel sites can use any custom domain. The script immediately exits on normal browser tabs and unrelated frames. It activates only in a direct iframe of `https://device-web-five.vercel.app`, when that viewer is itself the top-level page.
+Permissions are unchanged from version 1.0. The browser requests access to HTTPS pages because Vercel sites can use any custom domain. The script exits on normal tabs, unrelated frames and nested frames. It activates only in direct preview frames of the top-level `https://device-web-five.vercel.app` page.
 
-The bridge has no network requests, storage, background worker, analytics, cookie access, or extension API access. It exchanges only a random connection token, page path/query (to keep different pages separate), and relative scroll position with that viewer. Do not put secrets into website query strings. It accepts scroll commands only from the viewer's parent window after validating its origin and connection token.
+The bridge has no network requests, storage, background worker, analytics, cookie reads or extension API access. It exchanges a connection token, page path/query, scroll position, same-site link destinations, and control identifiers/short labels with the viewer. It does not collect form values. Avoid secrets in page URLs.
 
-The script shares the page's JavaScript environment so it can use the same startup guard as the optional site helper. This prevents two bridges from relaying duplicate scroll events. Website scripts can interfere with this environment; the extension exposes no privileged browser APIs to them.
+Commands require the exact parent window, viewer origin and connection token. Only genuine user input initiates interaction messages; synthetic replicated clicks do not echo. Disabled interaction sync and focused device views also disable interaction capture in the bridge.
 
-## Limits
+It shares the page's JavaScript environment with the optional site helper to prevent duplicate bridges. Website scripts can interfere with this environment. It exposes no privileged browser APIs. The broad HTTPS match is still a permission: only load helper files you trust.
 
-- Works in the browser where it is installed; it does not install into Safari, mobile browsers, or the Codex in-app browser.
-- Sites still need to allow embedding. This extension does not remove security headers, bypass Vercel sign-in, or change cookies.
-- Only HTTPS pages and the production Device Web domain are supported. For redirects, paste the site's final URL.
-- Sync applies to document scrolling in **All devices**. Independently scrolling menus, nested panels, and pages reached by different links remain independent.
-- Keep the browser's site access enabled for the domains you preview. Site script security policies or another extension can also interfere.
-- Existing site helpers can stay installed; only one bridge starts.
+## Limits and checks
 
-## Developer validation
+Sites must permit embedding. This helper does not remove security headers or bypass login. Chrome/Edge desktop only, in the profile where installed. Paste the final URL if a site redirects across domains. Existing website helpers can stay installed; the first bridge to start owns the connection.
 
-Run `node --test extension/bridge.test.mjs` from the repository root. Browser acceptance check: install the extension, open production Device Web, preview an HTTPS website without the site helper, and confirm all three connections. Scroll the MacBook down, then the iPhone back up. Confirm both peers move, **Sync scroll** off stops propagation, single-device views do not propagate, and reload reconnects. Open the target website directly and confirm `window.__deviceWebScrollExtension` is unset. Confirm an unrelated site's iframe also remains inactive. Finally, repeat with the example page (which already includes the site helper) to check duplicate prevention.
-
-References: [Chrome content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts), [manifest content scripts](https://developer.chrome.com/docs/extensions/reference/manifest/content-scripts), [install an unpacked extension](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked).
+Run `npm test` and `npm run build`. `tests/browser-interactions.mjs` tests a controlled fixture plus actual FVF menus/navigation in a temporary extension browser profile. The repository README has the command and covered behavior.
