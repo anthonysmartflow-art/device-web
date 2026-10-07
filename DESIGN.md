@@ -9,6 +9,7 @@ A personal tool for previewing the user's own Vercel websites. One action: enter
 - Compact title and URL bar above a large, open device stage. Devices sit on a shared baseline with independent proportional scaling, matching the reference's composition.
 - Signature: carefully drawn hardware frames around actual browser content. Metallic gradients belong only to the hardware; no ornamental page gradients.
 - Keep every device fully visible. Scale the whole device with its native internal viewport; never shrink the embedded viewport to its on-page display width.
+- All devices uses the available desktop width with proportional frames on a shared baseline and narrow gaps, up to a 2400px workspace. Do not shrink devices to fit the browser height: vertical page scrolling is preferable to unreadable previews. On narrow screens, stack larger proportional frames. Individual device views retain their existing sizing.
 - Device sizes: iPhone 390×844, iPad 834×1194, MacBook browser 1440×900 CSS pixels. Generic labels intentionally avoid claiming one exact current device model. These are layout previews, not OS/browser emulation.
 
 ## Behavior and accessibility

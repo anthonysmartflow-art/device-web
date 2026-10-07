@@ -4,15 +4,24 @@
 @media(max-width:1100px){.topbar{padding:24px 28px}main{padding:0 28px}.devices{gap:23px;min-height:370px}.intro{padding-top:24px;padding-bottom:28px}}
 @media(max-width:699px){.topbar{padding:22px 20px}.top-note{display:none}main{padding:0 20px}.intro{padding:25px 0 22px}h1{font-size:30px;letter-spacing:-1px;max-width:340px;margin:0 auto 12px}.intro>p{font-size:14px;max-width:275px;margin:0 auto 23px}.url-field{padding-left:12px;gap:8px}.url-field>svg{display:none}.url-field input{font-size:16px}.submit{padding:13px 14px;gap:9px}.submit span{display:none}.workspace-tools{flex-wrap:wrap;gap:3px;padding-bottom:12px}.device-switch{width:100%;justify-content:space-between}.device-switch button{padding:10px 10px;font-size:11px;min-height:44px;flex:1}.preview-actions{justify-content:flex-end;width:100%;gap:20px;min-height:44px}.devices{display:flex;flex-direction:column;gap:42px;align-items:center;padding-top:28px}.device{width:100%;gap:19px}.devices[data-view=all] .device-phone .device-stage{max-width:230px}.devices[data-view=all] .device-tablet .device-stage{max-width:360px}.devices:not([data-view=all]) .device-phone .device-stage{max-width:275px}.workspace-caption{align-items:start;flex-direction:column;gap:5px;padding-bottom:18px}.footer{flex-direction:column;gap:10px;padding-top:18px}.footer summary{text-align:left;min-height:44px}.footer details{width:100%}.help-content{margin-top:0}figcaption strong{font-size:14px}.devices:not([data-view=all]){min-height:0}.devices:not([data-view=all]) .device-laptop{padding-top:40px;padding-bottom:40px}}
 @media(prefers-reduced-motion:no-preference){button,a{transition:background-color .15s,color .15s,box-shadow .15s}}
-/* Keep all three devices in view on typical laptop displays. */
+/* Use the available width for readable device frames on a shared baseline.
+   Preserve native iframe dimensions; scroll the workspace vertically if needed. */
 @media(min-width:700px){
   .topbar{padding-top:22px;padding-bottom:22px}
   .intro{padding-top:12px;padding-bottom:14px}
   .intro>p{margin-bottom:22px}
-  .devices{--stage-cap:clamp(280px,calc(100svh - 480px),560px);padding-top:32px;padding-bottom:24px;min-height:0}
-  .devices[data-view=all] .device-phone .device-stage{max-width:min(240px,calc(var(--stage-cap)*.45474))}
-  .devices[data-view=all] .device-tablet .device-stage{max-width:min(400px,calc(var(--stage-cap)*.71564))}
-  .devices[data-view=all] .device-laptop .device-stage{max-width:min(740px,calc(var(--stage-cap)*1.54902))}
+  .devices{padding-top:32px;padding-bottom:24px;min-height:0}
+  body:has(.devices[data-view=all]) .topbar,
+  body:has(.devices[data-view=all]) main{max-width:2400px;padding-left:clamp(20px,2vw,40px);padding-right:clamp(20px,2vw,40px)}
+  body:has(.devices[data-view=all]) .intro{padding-top:4px;padding-bottom:4px}
+  body:has(.devices[data-view=all]) .intro>p{margin-bottom:14px}
+  .devices[data-view=all]{grid-template-columns:minmax(0,.9fr) minmax(0,1.45fr) minmax(0,2.5fr);gap:clamp(16px,1.5vw,24px);padding:24px 0}
+  .devices[data-view=all] .device{gap:18px}
+  .devices[data-view=all] .device-stage{max-width:none}
+}
+@media(max-width:699px){
+  .devices[data-view=all] .device-phone .device-stage{max-width:300px}
+  .devices[data-view=all] .device-tablet .device-stage{max-width:none}
 }
 /* The hardware camera stays outside the web page's content area. */
 .laptop .camera{top:3px;height:19px}
