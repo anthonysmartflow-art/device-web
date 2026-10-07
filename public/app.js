@@ -1,4 +1,5 @@
 import { normalizeUrl } from './url.js';
+import { ScrollSync } from './scroll-sync.js';
 const specs = [
   { id: 'phone', name: 'iPhone', width: 390, height: 844, outerWidth: 422, outerHeight: 928 },
   { id: 'tablet', name: 'iPad', width: 834, height: 1194, outerWidth: 906, outerHeight: 1266 },
@@ -17,6 +18,28 @@ const embedded = window.self !== window.top;
 if (embedded) {
   document.querySelector('main').innerHTML = '<p class="recursive-message">Open Device Web in its own tab to preview a website.</p>';
 } else {
+  const syncButton = document.querySelector('#sync-scroll');
+  const syncStatus = document.querySelector('#sync-status');
+  const syncSetup = document.querySelector('#sync-setup');
+  const sync = new ScrollSync({
+    isAllDevices: () => devices.dataset.view === 'all',
+    onChange: ({ enabled, total, ready, samePage }) => {
+      syncButton.setAttribute('aria-pressed', String(enabled));
+      syncButton.disabled = !total;
+      syncSetup.hidden = !total || ready === total;
+      if (!total) syncStatus.textContent = 'Live pages · Linked scrolling available';
+      else if (!enabled) syncStatus.textContent = 'Scroll sync off';
+      else if (devices.dataset.view !== 'all') syncStatus.textContent = 'Scroll sync applies in All devices';
+      else if (ready === total && samePage) syncStatus.textContent = 'Scroll linked across all devices';
+      else if (ready === total) syncStatus.textContent = 'Scroll linked for devices on the same page';
+      else syncStatus.textContent = ready ? `Scroll helper connected: ${ready} of ${total}` : 'Scroll sync needs a site connection';
+    },
+  });
+  syncButton.addEventListener('click', () => sync.toggle());
+  syncSetup.addEventListener('click', () => {
+    document.querySelector('#help').open = true;
+    document.querySelector('#sync-instructions').scrollIntoView({ block: 'nearest' });
+  });
   for (const spec of specs) {
     const figure = document.createElement('figure');
     figure.className = `device device-${spec.id}`;
@@ -46,6 +69,7 @@ if (embedded) {
 
   function setView(view) {
     devices.dataset.view = view;
+    sync.notify();
     document.querySelectorAll('[data-view]').forEach(button => {
       if (button.tagName === 'BUTTON') button.setAttribute('aria-pressed', String(button.dataset.view === view));
     });
@@ -54,6 +78,7 @@ if (embedded) {
   if (window.matchMedia('(max-width: 699px)').matches) setView('phone');
 
   function showUrl(url, example = false) {
+    sync.clear();
     activeUrl = url;
     isExample = example;
     error.textContent = '';
@@ -71,9 +96,11 @@ if (embedded) {
       frame.height = spec.height;
       frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals');
       frame.referrerPolicy = 'no-referrer';
+      sync.add(frame, url);
       frame.src = url;
       screen.replaceChildren(frame);
     }
+    sync.notify();
     // Remember only a convenience value. Reloading the app never opens a saved site automatically.
     try { if (!example) localStorage.setItem('device-web:last-url', url); } catch { /* Storage is optional. */ }
   }

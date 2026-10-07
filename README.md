@@ -4,7 +4,7 @@ A small website previewer: enter a URL and inspect the live page inside iPhone, 
 
 ## Use
 
-Paste an HTTPS website URL and select **Preview**. Each screen scrolls and navigates independently. Use the device buttons for a larger single-device view, **Reload** to reset all three screens to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
+Paste an HTTPS website URL and select **Preview**. Scrolling is linked in All devices when the target site has the scroll helper. Links navigate independently. Use the device buttons for a larger single-device view, **Reload** to reset all three screens to the submitted URL, or **Open site** to open the original URL in a new tab. **Try an example website** loads the included fictional Fieldwork sample.
 
 Desktop starts with all three devices. Narrow screens start with the iPhone; every view is available. The last submitted URL is remembered in this browser, but is never loaded automatically on return.
 
@@ -40,7 +40,7 @@ Embedding must be permitted by the **website being previewed**. Vercel hosting a
 - HTTPS viewers cannot embed HTTP websites. Use the target's HTTPS address.
 - Some websites intentionally navigate outside frames or depend on device/browser detection rather than responsive CSS. This basic viewer is a layout check, not full device emulation.
 
-Browsers deliberately hide cross-origin iframe errors. A frame load event cannot prove content rendered, so the app does not display a misleading "loaded successfully" badge. Use **Screen not loading?** for troubleshooting. Links and scrolling are independent, not synchronized.
+Browsers deliberately hide cross-origin iframe errors. A frame load event cannot prove content rendered, so the app does not display a misleading "loaded successfully" badge. Use **Preview help** for troubleshooting. Navigation remains independent. Scroll sync requires the opt-in helper described below.
 
 URLs go directly from your browser to the website. There is no URL-fetching backend, analytics, screenshot service or server-side URL storage. The app saves the last URL in localStorage on your device; avoid including secrets in URLs. Iframes allow scripts, forms and user-opened tabs while preventing top-level navigation of the viewer.
 
@@ -50,3 +50,17 @@ URLs go directly from your browser to the website. There is no URL-fetching back
 - `scripts/`: dependency-free build and local server.
 - `tests/`: URL normalization and validation tests.
 - `DESIGN.md`: approved visual direction and constraints.
+
+## Linked scrolling
+
+**Sync scroll** is on by default and applies in **All devices**. Scrolling any connected device moves the other connected devices on the same page to the same percentage of their scroll range. Different responsive layouts have different heights, so their exact section positions may differ. The control turns syncing off when independent scrolling is useful. Individual device views do not broadcast scrolls.
+
+The example page is already connected. Each website you own needs a one-time helper installation, because browsers do not let one origin read or set another origin's scroll position. This cannot be fixed by a CORS header.
+
+1. Copy `public/device-web-sync.js` from this repository into the target site's public folder.
+2. Load it on each page with `<script src="/device-web-sync.js" defer></script>`. In Next.js, use `next/script` with `src="/device-web-sync.js"` and `strategy="afterInteractive"` in the root layout.
+3. Publish that site, then reload its previews in Device Web. The caption will say **Scroll linked across all devices** only after all three helpers connect.
+
+The helper exits immediately outside an iframe. Inside an iframe, it accepts commands only from the parent window at `https://device-web-five.vercel.app` or its own origin. Messages validate origin, source, handshake token, path and finite scroll range. The helper sends page path and scroll fraction only; it sends no page text, cookies or form values and makes no network requests. The helper handles document scrolling, not separately scrolling menus or nested panels. Devices navigated to different pages do not drive each other.
+
+If you change the viewer's domain, update the helper's allowed origin or explicitly set `data-viewer-origin="https://your-viewer.example"` on its script tag. Never use a wildcard origin. Redirects to a different origin require entering the final website URL in the viewer.

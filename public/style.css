@@ -17,3 +17,6 @@
 /* The hardware camera stays outside the web page's content area. */
 .laptop .camera{top:3px;height:19px}
 .laptop .camera:after{top:6px}
+
+.sync-button[aria-pressed=true]:not(:disabled){color:var(--action);font-weight:650}.sync-button[aria-pressed=true]:not(:disabled)>span{background:#dbe8ed;border-radius:4px;padding:0 4px}.sync-caption{display:flex;align-items:center;gap:12px}.sync-caption .text-button{padding:0;min-height:28px;font-size:11px;text-decoration:underline}.sync-caption>span{max-width:290px}.help-content strong{display:block;margin-top:12px;color:var(--ink)}.help-content a{color:var(--action)}
+@media(max-width:699px){.preview-actions{gap:16px;justify-content:space-between}.sync-caption{flex-wrap:wrap;gap:2px 12px}}
